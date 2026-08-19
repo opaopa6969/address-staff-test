@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>住所データ確認スタッフ 採用テスト</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Sans",
+        "Yu Gothic",
+        Meiryo,
+        sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    line-height: 1.7;
+}
+
+header {
+    background: #263238;
+    color: white;
+    padding: 24px;
+}
+
+header h1 {
+    margin: 0 0 5px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 24px;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #eceff1;
+    padding-bottom: 10px;
+}
+
+.description {
+    background: #eef5ff;
+    border-left: 5px solid #1976d2;
+    padding: 14px;
+    margin-bottom: 20px;
+}
+
+.question {
+    padding: 18px;
+    margin: 15px 0;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.question.correct {
+    border: 2px solid #2e7d32;
+    background: #f1f8e9;
+}
+
+.question.incorrect {
+    border: 2px solid #c62828;
+    background: #ffebee;
+}
+
+.question.warning {
+    border: 2px solid #ef6c00;
+    background: #fff3e0;
+}
+
+.qtitle {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.address {
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    background: #eceff1;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 5px 0;
+    word-break: break-all;
+}
+
+.choices {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.radio-choice {
+    cursor: pointer;
+}
+
+.radio-choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-choice span {
+    display: inline-block;
+    min-width: 125px;
+    padding: 9px 15px;
+    text-align: center;
+    border: 2px solid #b0bec5;
+    border-radius: 7px;
+    background: white;
+    user-select: none;
+}
+
+.radio-choice span:hover {
+    background: #eceff1;
+}
+
+.radio-choice input:checked + span {
+    border-color: #1976d2;
+    background: #e3f2fd;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}
+
+button {
+    border: 0;
+    border-radius: 7px;
+    padding: 10px 16px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.primary {
+    background: #1976d2;
+    color: white;
+}
+
+.secondary {
+    background: #546e7a;
+    color: white;
+}
+
+.danger {
+    background: #c62828;
+    color: white;
+}
+
+.button-area {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.small {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+}
+
+/* =========================
+   差異クリック
+   ========================= */
+
+.diff-line,
+.parse-line {
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    background: #eceff1;
+    padding: 13px;
+    border-radius: 7px;
+    line-height: 2.5;
+    word-break: break-all;
+    user-select: none;
+}
+
+.char {
+    display: inline-block;
+    min-width: 1em;
+    padding: 0 2px;
+    margin: 1px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.char:hover {
+    background: #bbdefb;
+}
+
+.char.selected {
+    background: #1976d2;
+    color: white;
+}
+
+.char.answer {
+    outline: 2px solid #2e7d32;
+}
+
+/* =========================
+   要素分解
+   ========================= */
+
+.parse-tools {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.parse-tools button {
+    border: 1px solid #999;
+    background: white;
+}
+
+.parse-tools button:hover {
+    background: #eceff1;
+}
+
+.parse-segments {
+    margin-top: 12px;
+}
+
+.segment {
+    display: inline-block;
+    margin: 4px;
+    padding: 5px 9px;
+    border-radius: 5px;
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+}
+
+.segment button {
+    margin-left: 5px;
+    padding: 1px 6px;
+    background: transparent;
+    color: #c62828;
+}
+
+.parse-char.assigned {
+    background: #dcedc8;
+}
+
+.parse-char.range-selected {
+    background: #1976d2;
+    color: white;
+}
+
+.result {
+    display: none;
+}
+
+.result.show {
+    display: block;
+}
+
+.score-main {
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.score-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(160px,1fr));
+    gap: 10px;
+}
+
+.score-box {
+    padding: 14px;
+    background: #eceff1;
+    border-radius: 7px;
+    text-align: center;
+}
+
+.score-box strong {
+    font-size: 26px;
+}
+
+.grade {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 7px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.good {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.normal {
+    background: #fff8e1;
+    color: #e65100;
+}
+
+.bad {
+    background: #ffebee;
+    color: #b71c1c;
+}
+
+.progress-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+}
+
+.progress {
+    height: 6px;
+    background: #ddd;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: #1976d2;
+}
+
+.progress-text {
+    max-width: 1100px;
+    margin: auto;
+    padding: 5px 24px;
+    font-size: 13px;
+}
+
+.timer {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    background: #263238;
+    color: white;
+    padding: 8px 13px;
+    border-radius: 6px;
+    z-index: 50;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 12px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .choices {
+        flex-direction: column;
+    }
+
+    .radio-choice,
+    .radio-choice span {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>住所データ確認スタッフ 採用テスト</h1>
+    <div>
+        住所の識別・構造理解・注意力・継続精度を確認します。
+    </div>
+</header>
+
+<div class="progress-wrapper">
+    <div class="progress">
+        <div
+            id="progressBar"
+            class="progress-bar"
+        ></div>
+    </div>
+
+    <div
+        id="progressText"
+        class="progress-text"
+    >
+        回答状況：0%
+    </div>
+</div>
+
+<div
+    id="timer"
+    class="timer"
+>
+    00:00
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h2>受験者</h2>
+
+        <input
+            id="applicantName"
+            type="text"
+            placeholder="氏名"
+        >
+    </div>
+
+    <!-- =========================
+         問1
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第1問：住所の比較</h2>
+
+        <div class="description">
+            2つの住所が同じ場所を表しているか判定してください。
+        </div>
+
+        <div id="section1"></div>
+
+    </section>
+
+    <!-- =========================
+         問2
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第2問：差異箇所の発見</h2>
+
+        <div class="description">
+            AとBで異なる文字をクリックしてください。<br>
+            両側に違う文字があれば、それぞれ選択します。<br>
+            完全に同じ場合は「違いなし」を押してください。
+        </div>
+
+        <div id="section2"></div>
+
+    </section>
+
+    <!-- =========================
+         問3
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第3問：住所要素の分解</h2>
+
+        <div class="description">
+            住所を意味のある要素に分けてください。<br><br>
+
+            <strong>操作方法：</strong><br>
+            開始文字と終了文字をクリックして範囲を選択し、
+            その範囲が何を表すかボタンで指定してください。<br><br>
+
+            例：<br>
+            東京都 → 都道府県<br>
+            新宿区 → 市区町村<br>
+            西新宿 → 町域<br>
+            2丁目 → 丁目<br>
+            8番 → 番<br>
+            1号 → 号<br>
+            NSビル → 建物名<br>
+            A → 棟・館等<br>
+            103 → 号室<br><br>
+
+            住所には複数の自然な分け方が存在する場合があります。<br>
+            その場合は複数の解釈を正解として扱います。
+        </div>
+
+        <div id="section3"></div>
+
+    </section>
+
+    <!-- =========================
+         問4
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第4問：地名の読み</h2>
+
+        <div class="description">
+            読みを入力してください。<br>
+            分からない場合は「不明」で構いません。
+        </div>
+
+        <div id="section4"></div>
+
+    </section>
+
+    <!-- =========================
+         問5
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第5問：連続判定</h2>
+
+        <div class="description">
+            なるべく途中で休まず、
+            上から順番に判定してください。
+        </div>
+
+        <div id="section5"></div>
+
+    </section>
+
+    <!-- =========================
+         問6
+         ========================= -->
+
+    <section class="card">
+
+        <h2>第6問：業務判断</h2>
+
+        <div id="section6"></div>
+
+    </section>
+
+    <div class="button-area">
+
+        <button
+            class="primary"
+            onclick="scoreTest()"
+        >
+            採点する
+        </button>
+
+        <button
+            class="danger"
+            onclick="resetTest()"
+        >
+            リセット
+        </button>
+
+    </div>
+
+    <!-- =========================
+         結果
+         ========================= -->
+
+    <section
+        id="result"
+        class="card result"
+    >
+
+        <h2>採点結果</h2>
+
+        <div class="score-main">
+            <span id="totalScore"></span>
+            / 100
+        </div>
+
+        <div
+            id="grade"
+            class="grade"
+        ></div>
+
+        <div class="score-grid">
+
+            <div class="score-box">
+                住所判定<br>
+                <strong id="score1"></strong>
+            </div>
+
+            <div class="score-box">
+                差異発見<br>
+                <strong id="score2"></strong>
+            </div>
+
+            <div class="score-box">
+                要素分解<br>
+                <strong id="score3"></strong>
+            </div>
+
+            <div class="score-box">
+                地名<br>
+                <strong id="score4"></strong>
+            </div>
+
+            <div class="score-box">
+                連続精度<br>
+                <strong id="score5"></strong>
+            </div>
+
+            <div class="score-box">
+                判断姿勢<br>
+                <strong id="score6"></strong>
+            </div>
+
+        </div>
+
+        <h3>所見</h3>
+
+        <div id="review"></div>
+
+    </section>
+
+</div>
+
+<script>
+
+/* =========================================================
+   問1
+   ========================================================= */
+
+const q1 = [
+
+    {
+        a: "東京都新宿区西新宿2-8-1",
+        b: "東京都新宿区西新宿2丁目8番1号",
+        answer: "same"
+    },
+
+    {
+        a: "東京都新宿区西新宿2-8-1",
+        b: "東京都新宿区新宿2丁目8番1号",
+        answer: "different"
+    },
+
+    {
+        a: "大阪市北区梅田1-2-2",
+        b: "大阪市北区梅田1丁目2番2号",
+        answer: "same"
+    },
+
+    {
+        a: "横浜市中区山下町10-2",
+        b: "横浜市中区山下町10-3",
+        answer: "different"
+    },
+
+    {
+        a: "港区芝公園4-2-8 ABCビル301",
+        b: "港区芝公園4丁目2番8号 ABCビル301号室",
+        answer: "same"
+    },
+
+    {
+        a: "港区芝公園4-2-8 ABCビル301",
+        b: "港区芝公園4丁目2番8号 ABCビル310号室",
+        answer: "different"
+    }
+
+];
+
+
+/* =========================================================
+   問2
+   ========================================================= */
+
+const q2 = [
+
+    {
+        a: "東京都中央区日本橋蛎殻町2丁目5番3号",
+        b: "東京都中央区日本橋蠣殻町2丁目5番3号"
+    },
+
+    {
+        a: "東京都新宿区西新宿2丁目8番1号",
+        b: "東京都新宿区新宿2丁目8番1号"
+    },
+
+    {
+        a: "ABCビル305",
+        b: "ABCビル350"
+    },
+
+    {
+        a: "大阪市北区梅田1丁目2番3号",
+        b: "大阪市北区梅田1丁目2番3号"
+    }
+
+];
+
+
+/* =========================================================
+   問3 要素分解
+
+   answers:
+   複数の許容パターンを登録可能
+   ========================================================= */
+
+const q3 = [
+
+    {
+        address:
+            "東京都新宿区西新宿2丁目8番1号NSビルA103",
+
+        answers: [
+
+            [
+                { text: "東京都", type: "prefecture" },
+                { text: "新宿区", type: "city" },
+                { text: "西新宿", type: "town" },
+                { text: "2丁目", type: "chome" },
+                { text: "8番", type: "ban" },
+                { text: "1号", type: "go" },
+                { text: "NSビル", type: "building" },
+                { text: "A", type: "buildingPart" },
+                { text: "103", type: "room" }
+            ],
+
+            [
+                { text: "東京都", type: "prefecture" },
+                { text: "新宿区", type: "city" },
+                { text: "西新宿", type: "town" },
+                { text: "2丁目", type: "chome" },
+                { text: "8番", type: "ban" },
+                { text: "1号", type: "go" },
+                { text: "NSビル", type: "building" },
+                { text: "A103", type: "room" }
+            ]
+
+        ]
+    },
+
+    {
+        address:
+            "東京都渋谷区神宮前1丁目2番3号グリーンハイツ305",
+
+        answers: [
+
+            [
+                { text: "東京都", type: "prefecture" },
+                { text: "渋谷区", type: "city" },
+                { text: "神宮前", type: "town" },
+                { text: "1丁目", type: "chome" },
+                { text: "2番", type: "ban" },
+                { text: "3号", type: "go" },
+                { text: "グリーンハイツ", type: "building" },
+                { text: "305", type: "room" }
+            ]
+
+        ]
+    },
+
+    {
+        address:
+            "大阪府大阪市北区梅田1丁目5番ABCタワー12階",
+
+        answers: [
+
+            [
+                { text: "大阪府", type: "prefecture" },
+                { text: "大阪市北区", type: "city" },
+                { text: "梅田", type: "town" },
+                { text: "1丁目", type: "chome" },
+                { text: "5番", type: "ban" },
+                { text: "ABCタワー", type: "building" },
+                { text: "12階", type: "floor" }
+            ]
+
+        ]
+    },
+
+    {
+        address:
+            "神奈川県横浜市中区山下町10番2号ベイコートB棟502号室",
+
+        answers: [
+
+            [
+                { text: "神奈川県", type: "prefecture" },
+                { text: "横浜市中区", type: "city" },
+                { text: "山下町", type: "town" },
+                { text: "10番", type: "ban" },
+                { text: "2号", type: "go" },
+                { text: "ベイコート", type: "building" },
+                { text: "B棟", type: "buildingPart" },
+                { text: "502号室", type: "room" }
+            ]
+
+        ]
+    },
+
+    {
+        address:
+            "北海道札幌市中央区北3条西4丁目1番1号タワーWEST1502",
+
+        answers: [
+
+            [
+                { text: "北海道", type: "prefecture" },
+                { text: "札幌市中央区", type: "city" },
+                { text: "北3条西4丁目", type: "town" },
+                { text: "1番", type: "ban" },
+                { text: "1号", type: "go" },
+                { text: "タワーWEST", type: "building" },
+                { text: "1502", type: "room" }
+            ],
+
+            [
+                { text: "北海道", type: "prefecture" },
+                { text: "札幌市中央区", type: "city" },
+                { text: "北3条西4丁目", type: "town" },
+                { text: "1番", type: "ban" },
+                { text: "1号", type: "go" },
+                { text: "タワー", type: "building" },
+                { text: "WEST", type: "buildingPart" },
+                { text: "1502", type: "room" }
+            ]
+
+        ]
+    },
+
+    {
+        address:
+            "東京都品川区大崎1丁目2番3号ThinkParkTower18F",
+
+        answers: [
+
+            [
+                { text: "東京都", type: "prefecture" },
+                { text: "品川区", type: "city" },
+                { text: "大崎", type: "town" },
+                { text: "1丁目", type: "chome" },
+                { text: "2番", type: "ban" },
+                { text: "3号", type: "go" },
+                { text: "ThinkParkTower", type: "building" },
+                { text: "18F", type: "floor" }
+            ]
+
+        ]
+    }
+
+];
+
+
+/* =========================================================
+   問4
+   ========================================================= */
+
+const q4 = [
+
+    ["御徒町", "おかちまち"],
+    ["舎人", "とねり"],
+    ["放出", "はなてん"],
+    ["十三", "じゅうそう"],
+    ["喜連瓜破", "きれうりわり"]
+
+];
+
+
+/* =========================================================
+   問5
+   ========================================================= */
+
+const q5 = [
+
+    [
+        "杉並区高円寺南2-4-8",
+        "杉並区高円寺南2丁目4番8号",
+        "same"
+    ],
+
+    [
+        "杉並区高円寺南2-4-8",
+        "杉並区高円寺南2丁目4番9号",
+        "different"
+    ],
+
+    [
+        "練馬区豊玉北3-5-7",
+        "練馬区豊玉北3丁目5番7号",
+        "same"
+    ],
+
+    [
+        "練馬区豊玉北3-5-7",
+        "練馬区豊玉南3丁目5番7号",
+        "different"
+    ],
+
+    [
+        "板橋区大山町12-3",
+        "板橋区大山町12番3号",
+        "same"
+    ],
+
+    [
+        "江東区亀戸6-10-2",
+        "江東区亀戸6丁目10番20号",
+        "different"
+    ],
+
+    [
+        "品川区大井1-4-6",
+        "品川区大井1丁目4番6号",
+        "same"
+    ],
+
+    [
+        "品川区大井1-4-6",
+        "品川区大崎1丁目4番6号",
+        "different"
+    ],
+
+    [
+        "北区赤羽2-15-8",
+        "北区赤羽2丁目15番8号",
+        "same"
+    ],
+
+    [
+        "北区赤羽2-15-8",
+        "北区赤羽2丁目15番3号",
+        "different"
+    ]
+
+];
+
+
+/* =========================================================
+   問6
+   ========================================================= */
+
+const q6 = [
+
+    {
+        text:
+            "番地の数字が入力住所と正規化結果で異なっています。",
+
+        choices: [
+            "似ているのでそのまま承認する",
+            "保留して確認する",
+            "正規化結果を正しいとみなす"
+        ],
+
+        answer: 1
+    },
+
+    {
+        text:
+            "地名の読みが分からず判断できません。",
+
+        choices: [
+            "推測する",
+            "判断不能として確認に回す",
+            "適当に近い地名を選ぶ"
+        ],
+
+        answer: 1
+    },
+
+    {
+        text:
+            "建物名の後ろに「A103」とあります。Aが棟名か部屋番号の一部か断定できません。",
+
+        choices: [
+            "必ずA棟103号室とする",
+            "必ずA103号室とする",
+            "複数の可能性を認識し、必要なら確認する"
+        ],
+
+        answer: 2
+    }
+
+];
+
+
+/* =========================================================
+   ラベル
+   ========================================================= */
+
+const labels = {
+
+    prefecture: "都道府県",
+    city: "市区町村",
+    town: "町域",
+    chome: "丁目",
+    ban: "番",
+    go: "号",
+    building: "建物名",
+    buildingPart: "棟・館等",
+    floor: "階",
+    room: "号室",
+    other: "その他"
+
+};
+
+
+/* =========================================================
+   状態
+   ========================================================= */
+
+const diffState =
+    q2.map(() => ({
+        a: new Set(),
+        b: new Set(),
+        noDifference: false
+    }));
+
+
+const parseState =
+    q3.map(() => ({
+        start: null,
+        end: null,
+        segments: []
+    }));
+
+
+/* =========================================================
+   共通
+   ========================================================= */
+
+function esc(s) {
+
+    return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function radio(
+    name,
+    value,
+    text
+) {
+
+    return `
+        <label class="radio-choice">
+
+            <input
+                type="radio"
+                name="${name}"
+                value="${value}"
+            >
+
+            <span>
+                ${esc(text)}
+            </span>
+
+        </label>
+    `;
+
+}
+
+
+function valueOf(name) {
+
+    const e =
+        document.querySelector(
+            `input[name="${name}"]:checked`
+        );
+
+    return e
+        ? e.value
+        : null;
+
+}
+
+
+function mark(
+    id,
+    type
+) {
+
+    const e =
+        document.getElementById(id);
+
+    e.classList.remove(
+        "correct",
+        "incorrect",
+        "warning"
+    );
+
+    e.classList.add(type);
+
+}
+
+
+/* =========================================================
+   問1 表示
+   ========================================================= */
+
+function renderQ1() {
+
+    document
+        .getElementById("section1")
+        .innerHTML =
+
+        q1.map((x, i) => `
+
+            <div
+                class="question"
+                id="q1_${i}"
+            >
+
+                <div class="address">
+                    ${esc(x.a)}
+                </div>
+
+                <div class="address">
+                    ${esc(x.b)}
+                </div>
+
+                <div class="choices">
+
+                    ${radio(
+                        `q1r${i}`,
+                        "same",
+                        "同じ"
+                    )}
+
+                    ${radio(
+                        `q1r${i}`,
+                        "different",
+                        "異なる"
+                    )}
+
+                    ${radio(
+                        `q1r${i}`,
+                        "unknown",
+                        "判断できない"
+                    )}
+
+                </div>
+
+                <div
+                    class="small"
+                    id="q1f${i}"
+                ></div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =========================================================
+   LCS差分
+   ========================================================= */
+
+function diff(
+    aText,
+    bText
+) {
+
+    const a =
+        Array.from(aText);
+
+    const b =
+        Array.from(bText);
+
+    const dp =
+        Array.from(
+            {
+                length: a.length + 1
+            },
+            () =>
+                Array(
+                    b.length + 1
+                ).fill(0)
+        );
+
+
+    for (
+        let i = a.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        for (
+            let j = b.length - 1;
+            j >= 0;
+            j--
+        ) {
+
+            dp[i][j] =
+                a[i] === b[j]
+
+                ? dp[i + 1][j + 1] + 1
+
+                : Math.max(
+                    dp[i + 1][j],
+                    dp[i][j + 1]
+                );
+        }
+    }
+
+
+    const da =
+        new Set();
+
+    const db =
+        new Set();
+
+
+    let i = 0;
+    let j = 0;
+
+
+    while (
+        i < a.length &&
+        j < b.length
+    ) {
+
+        if (
+            a[i] === b[j]
+        ) {
+
+            i++;
+            j++;
+
+            continue;
+        }
+
+
+        if (
+            dp[i + 1][j] >
+            dp[i][j + 1]
+        ) {
+
+            da.add(i);
+            i++;
+
+        } else if (
+            dp[i + 1][j] <
+            dp[i][j + 1]
+        ) {
+
+            db.add(j);
+            j++;
+
+        } else {
+
+            da.add(i);
+            db.add(j);
+
+            i++;
+            j++;
+        }
+    }
+
+
+    while (
+        i < a.length
+    ) {
+
+        da.add(i);
+        i++;
+    }
+
+
+    while (
+        j < b.length
+    ) {
+
+        db.add(j);
+        j++;
+    }
+
+
+    return {
+        a: da,
+        b: db
+    };
+
+}
+
+
+/* =========================================================
+   問2
+   ========================================================= */
+
+function diffChars(
+    text,
+    qIndex,
+    side
+) {
+
+    return Array
+        .from(text)
+        .map((c, i) => `
+
+            <span
+                class="char"
+                id="d_${qIndex}_${side}_${i}"
+                onclick="toggleDiff(
+                    ${qIndex},
+                    '${side}',
+                    ${i}
+                )"
+            >
+                ${esc(c)}
+            </span>
+
+        `)
+        .join("");
+
+}
+
+
+function renderQ2() {
+
+    document
+        .getElementById("section2")
+        .innerHTML =
+
+        q2.map((x, i) => `
+
+            <div
+                class="question"
+                id="q2_${i}"
+            >
+
+                <strong>A</strong>
+
+                <div class="diff-line">
+                    ${diffChars(
+                        x.a,
+                        i,
+                        "a"
+                    )}
+                </div>
+
+                <strong>B</strong>
+
+                <div class="diff-line">
+                    ${diffChars(
+                        x.b,
+                        i,
+                        "b"
+                    )}
+                </div>
+
+                <div class="button-area">
+
+                    <button
+                        class="secondary"
+                        onclick="noDiff(${i})"
+                    >
+                        違いなし
+                    </button>
+
+                    <button
+                        onclick="clearDiff(${i})"
+                    >
+                        選択解除
+                    </button>
+
+                </div>
+
+                <div
+                    class="small"
+                    id="q2f${i}"
+                ></div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+function toggleDiff(
+    qi,
+    side,
+    index
+) {
+
+    const s =
+        diffState[qi];
+
+    s.noDifference =
+        false;
+
+    const set =
+        s[side];
+
+    if (
+        set.has(index)
+    ) {
+
+        set.delete(index);
+
+    } else {
+
+        set.add(index);
+    }
+
+    refreshDiff(qi);
+    countAnswered();
+
+}
+
+
+function noDiff(i) {
+
+    diffState[i].a.clear();
+    diffState[i].b.clear();
+
+    diffState[i].noDifference =
+        true;
+
+    refreshDiff(i);
+    countAnswered();
+
+}
+
+
+function clearDiff(i) {
+
+    diffState[i].a.clear();
+    diffState[i].b.clear();
+
+    diffState[i].noDifference =
+        false;
+
+    refreshDiff(i);
+    countAnswered();
+
+}
+
+
+function refreshDiff(qi) {
+
+    ["a", "b"]
+        .forEach(side => {
+
+            Array
+                .from(q2[qi][side])
+                .forEach((_, i) => {
+
+                    const el =
+                        document.getElementById(
+                            `d_${qi}_${side}_${i}`
+                        );
+
+                    el.classList.toggle(
+                        "selected",
+                        diffState[qi][side].has(i)
+                    );
+
+                });
+
+        });
+
+}
+
+
+function setEqual(
+    a,
+    b
+) {
+
+    if (
+        a.size !== b.size
+    ) {
+
+        return false;
+    }
+
+    for (
+        const x of a
+    ) {
+
+        if (
+            !b.has(x)
+        ) {
+
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
+
+/* =========================================================
+   問3 要素分解
+   ========================================================= */
+
+function parseChars(
+    text,
+    qi
+) {
+
+    return Array
+        .from(text)
+        .map((c, i) => `
+
+            <span
+                class="char parse-char"
+                id="p_${qi}_${i}"
+                onclick="selectParseChar(
+                    ${qi},
+                    ${i}
+                )"
+            >
+                ${esc(c)}
+            </span>
+
+        `)
+        .join("");
+
+}
+
+
+function renderQ3() {
+
+    document
+        .getElementById("section3")
+        .innerHTML =
+
+        q3.map((x, i) => `
+
+            <div
+                class="question"
+                id="q3_${i}"
+            >
+
+                <div class="qtitle">
+                    ${i + 1}
+                </div>
+
+                <div class="parse-line">
+                    ${parseChars(
+                        x.address,
+                        i
+                    )}
+                </div>
+
+                <div class="small">
+                    最初の文字と最後の文字をクリックしてください。
+                    1文字だけの場合は、その文字を1回クリックした状態で分類ボタンを押せます。
+                </div>
+
+                <div class="parse-tools">
+
+                    ${
+                        Object
+                            .entries(labels)
+                            .map(
+                                ([type, label]) => `
+
+                                <button
+                                    onclick="assignParse(
+                                        ${i},
+                                        '${type}'
+                                    )"
+                                >
+                                    ${label}
+                                </button>
+
+                            `)
+                            .join("")
+                    }
+
+                    <button
+                        class="danger"
+                        onclick="clearParse(${i})"
+                    >
+                        全部クリア
+                    </button>
+
+                </div>
+
+                <div
+                    class="parse-segments"
+                    id="segments_${i}"
+                ></div>
+
+                <div
+                    class="small"
+                    id="q3f${i}"
+                ></div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+function selectParseChar(
+    qi,
+    index
+) {
+
+    const s =
+        parseState[qi];
+
+
+    if (
+        s.start === null
+    ) {
+
+        s.start =
+            index;
+
+        s.end =
+            null;
+
+    } else {
+
+        s.end =
+            index;
+
+        if (
+            s.end < s.start
+        ) {
+
+            const tmp =
+                s.start;
+
+            s.start =
+                s.end;
+
+            s.end =
+                tmp;
+        }
+    }
+
+
+    refreshParse(qi);
+
+}
+
+
+function assignParse(
+    qi,
+    type
+) {
+
+    const s =
+        parseState[qi];
+
+
+    if (
+        s.start === null
+    ) {
+
+        return;
+    }
+
+
+    const end =
+        s.end === null
+            ? s.start
+            : s.end;
+
+
+    const text =
+        Array
+            .from(q3[qi].address)
+            .slice(
+                s.start,
+                end + 1
+            )
+            .join("");
+
+
+    s.segments.push({
+
+        start:
+            s.start,
+
+        end:
+            end,
+
+        text:
+            text,
+
+        type:
+            type
+
+    });
+
+
+    s.start =
+        null;
+
+    s.end =
+        null;
+
+
+    refreshParse(qi);
+    countAnswered();
+
+}
+
+
+function deleteSegment(
+    qi,
+    index
+) {
+
+    parseState[qi]
+        .segments
+        .splice(
+            index,
+            1
+        );
+
+    refreshParse(qi);
+    countAnswered();
+
+}
+
+
+function clearParse(qi) {
+
+    parseState[qi].start =
+        null;
+
+    parseState[qi].end =
+        null;
+
+    parseState[qi].segments =
+        [];
+
+    refreshParse(qi);
+    countAnswered();
+
+}
+
+
+function refreshParse(qi) {
+
+    const s =
+        parseState[qi];
+
+    const chars =
+        Array.from(
+            q3[qi].address
+        );
+
+
+    chars.forEach((_, i) => {
+
+        const el =
+            document.getElementById(
+                `p_${qi}_${i}`
+            );
+
+
+        el.classList.remove(
+            "assigned",
+            "range-selected"
+        );
+
+
+        for (
+            const seg of s.segments
+        ) {
+
+            if (
+                i >= seg.start &&
+                i <= seg.end
+            ) {
+
+                el.classList.add(
+                    "assigned"
+                );
+            }
+        }
+
+
+        if (
+            s.start !== null
+        ) {
+
+            const end =
+                s.end === null
+                    ? s.start
+                    : s.end;
+
+
+            if (
+                i >= s.start &&
+                i <= end
+            ) {
+
+                el.classList.add(
+                    "range-selected"
+                );
+            }
+        }
+
+    });
+
+
+    document
+        .getElementById(
+            `segments_${qi}`
+        )
+        .innerHTML =
+
+        s.segments.length === 0
+
+        ? "<span class='small'>まだ要素は指定されていません。</span>"
+
+        : s.segments
+            .map((seg, i) => `
+
+                <span class="segment">
+
+                    <strong>
+                        ${esc(labels[seg.type])}
+                    </strong>
+
+                    ：
+                    ${esc(seg.text)}
+
+                    <button
+                        onclick="deleteSegment(
+                            ${qi},
+                            ${i}
+                        )"
+                    >
+                        ×
+                    </button>
+
+                </span>
+
+            `)
+            .join("");
+
+}
+
+
+/* =========================================================
+   問3 採点
+   ========================================================= */
+
+function normalizeSegments(
+    segments
+) {
+
+    return segments
+        .map(x => ({
+            text: x.text,
+            type: x.type
+        }))
+        .sort(
+            (a, b) =>
+                (a.text + a.type)
+                    .localeCompare(
+                        b.text + b.type
+                    )
+        );
+
+}
+
+
+function patternEqual(
+    actual,
+    expected
+) {
+
+    if (
+        actual.length !==
+        expected.length
+    ) {
+
+        return false;
+    }
+
+
+    const a =
+        normalizeSegments(
+            actual
+        );
+
+    const e =
+        normalizeSegments(
+            expected
+        );
+
+
+    for (
+        let i = 0;
+        i < a.length;
+        i++
+    ) {
+
+        if (
+            a[i].text !== e[i].text ||
+            a[i].type !== e[i].type
+        ) {
+
+            return false;
+        }
+    }
+
+
+    return true;
+
+}
+
+
+function scoreParseQuestion(
+    qi
+) {
+
+    const actual =
+        parseState[qi].segments;
+
+
+    let bestRatio =
+        0;
+
+    let exact =
+        false;
+
+
+    for (
+        const pattern
+        of q3[qi].answers
+    ) {
+
+        if (
+            patternEqual(
+                actual,
+                pattern
+            )
+        ) {
+
+            exact =
+                true;
+
+            bestRatio =
+                1;
+
+            break;
+        }
+
+
+        let hit =
+            0;
+
+
+        for (
+            const a of actual
+        ) {
+
+            if (
+                pattern.some(
+                    e =>
+                        e.text === a.text &&
+                        e.type === a.type
+                )
+            ) {
+
+                hit++;
+            }
+        }
+
+
+        const ratio =
+            hit /
+            Math.max(
+                pattern.length,
+                actual.length,
+                1
+            );
+
+
+        bestRatio =
+            Math.max(
+                bestRatio,
+                ratio
+            );
+    }
+
+
+    return {
+        exact,
+        ratio: bestRatio
+    };
+
+}
+
+
+/* =========================================================
+   問4
+   ========================================================= */
+
+function renderQ4() {
+
+    document
+        .getElementById("section4")
+        .innerHTML =
+
+        q4.map((x, i) => `
+
+            <div
+                class="question"
+                id="q4_${i}"
+            >
+
+                <strong>
+                    ${esc(x[0])}
+                </strong>
+
+                <input
+                    type="text"
+                    id="q4i${i}"
+                    placeholder="読み、または「不明」"
+                >
+
+                <div
+                    class="small"
+                    id="q4f${i}"
+                ></div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =========================================================
+   問5
+   ========================================================= */
+
+function renderQ5() {
+
+    document
+        .getElementById("section5")
+        .innerHTML =
+
+        q5.map((x, i) => `
+
+            <div
+                class="question"
+                id="q5_${i}"
+            >
+
+                <div class="address">
+                    ${esc(x[0])}
+                </div>
+
+                <div class="address">
+                    ${esc(x[1])}
+                </div>
+
+                <div class="choices">
+
+                    ${radio(
+                        `q5r${i}`,
+                        "same",
+                        "同じ"
+                    )}
+
+                    ${radio(
+                        `q5r${i}`,
+                        "different",
+                        "異なる"
+                    )}
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =========================================================
+   問6
+   ========================================================= */
+
+function renderQ6() {
+
+    document
+        .getElementById("section6")
+        .innerHTML =
+
+        q6.map((x, i) => `
+
+            <div
+                class="question"
+                id="q6_${i}"
+            >
+
+                <div class="qtitle">
+                    ${esc(x.text)}
+                </div>
+
+                <div class="choices">
+
+                    ${
+                        x.choices
+                            .map(
+                                (c, j) =>
+                                    radio(
+                                        `q6r${i}`,
+                                        String(j),
+                                        c
+                                    )
+                            )
+                            .join("")
+                    }
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =========================================================
+   採点
+   ========================================================= */
+
+function scoreTest() {
+
+    /* =====================
+       問1 15点
+       ===================== */
+
+    let c1 =
+        0;
+
+
+    q1.forEach((x, i) => {
+
+        const ok =
+            valueOf(
+                `q1r${i}`
+            ) === x.answer;
+
+
+        if (
+            ok
+        ) {
+
+            c1++;
+        }
+
+
+        mark(
+            `q1_${i}`,
+            ok
+                ? "correct"
+                : "incorrect"
+        );
+
+
+        document
+            .getElementById(
+                `q1f${i}`
+            )
+            .textContent =
+                `正解：${
+                    x.answer === "same"
+                        ? "同じ"
+                        : "異なる"
+                }`;
+
+    });
+
+
+    const score1 =
+        c1 /
+        q1.length *
+        15;
+
+
+    /* =====================
+       問2 15点
+       ===================== */
+
+    let c2 =
+        0;
+
+
+    q2.forEach((x, i) => {
+
+        const ans =
+            diff(
+                x.a,
+                x.b
+            );
+
+
+        const same =
+            ans.a.size === 0 &&
+            ans.b.size === 0;
+
+
+        const s =
+            diffState[i];
+
+
+        const ok =
+
+            same
+
+            ? s.noDifference
+
+            : !s.noDifference &&
+              setEqual(
+                  s.a,
+                  ans.a
+              ) &&
+              setEqual(
+                  s.b,
+                  ans.b
+              );
+
+
+        if (
+            ok
+        ) {
+
+            c2++;
+        }
+
+
+        mark(
+            `q2_${i}`,
+            ok
+                ? "correct"
+                : "incorrect"
+        );
+
+
+        document
+            .getElementById(
+                `q2f${i}`
+            )
+            .textContent =
+
+            ok
+                ? "正解"
+                : "差異箇所を再確認してください";
+
+    });
+
+
+    const score2 =
+        c2 /
+        q2.length *
+        15;
+
+
+    /* =====================
+       問3 35点
+       ===================== */
+
+    let parseTotal =
+        0;
+
+    let parseExact =
+        0;
+
+
+    q3.forEach((x, i) => {
+
+        const r =
+            scoreParseQuestion(i);
+
+
+        parseTotal +=
+            r.ratio;
+
+
+        if (
+            r.exact
+        ) {
+
+            parseExact++;
+        }
+
+
+        mark(
+            `q3_${i}`,
+
+            r.exact
+                ? "correct"
+                : r.ratio >= 0.6
+                    ? "warning"
+                    : "incorrect"
+        );
+
+
+        document
+            .getElementById(
+                `q3f${i}`
+            )
+            .textContent =
+
+            r.exact
+                ? "正解"
+                : `部分一致：${Math.round(
+                    r.ratio * 100
+                )}%`;
+
+    });
+
+
+    const score3 =
+        parseTotal /
+        q3.length *
+        35;
+
+
+    /* =====================
+       問4 10点
+       ===================== */
+
+    let c4 =
+        0;
+
+    let unknown4 =
+        0;
+
+
+    q4.forEach((x, i) => {
+
+        const v =
+            document
+                .getElementById(
+                    `q4i${i}`
+                )
+                .value
+                .trim();
+
+
+        if (
+            v === x[1]
+        ) {
+
+            c4++;
+
+            mark(
+                `q4_${i}`,
+                "correct"
+            );
+
+        } else if (
+            v === "不明"
+        ) {
+
+            unknown4++;
+
+            mark(
+                `q4_${i}`,
+                "warning"
+            );
+
+        } else {
+
+            mark(
+                `q4_${i}`,
+                "incorrect"
+            );
+        }
+
+
+        document
+            .getElementById(
+                `q4f${i}`
+            )
+            .textContent =
+                `読み：${x[1]}`;
+
+    });
+
+
+    const score4 =
+        (
+            c4 +
+            unknown4 * 0.3
+        )
+        /
+        q4.length
+        *
+        10;
+
+
+    /* =====================
+       問5 15点
+       ===================== */
+
+    let c5 =
+        0;
+
+    let first =
+        0;
+
+    let second =
+        0;
+
+
+    q5.forEach((x, i) => {
+
+        const ok =
+            valueOf(
+                `q5r${i}`
+            ) === x[2];
+
+
+        if (
+            ok
+        ) {
+
+            c5++;
+
+            if (
+                i < 5
+            ) {
+
+                first++;
+
+            } else {
+
+                second++;
+            }
+        }
+
+
+        mark(
+            `q5_${i}`,
+            ok
+                ? "correct"
+                : "incorrect"
+        );
+
+    });
+
+
+    let score5 =
+        c5 /
+        q5.length *
+        15;
+
+
+    if (
+        first - second >= 2
+    ) {
+
+        score5 -=
+            2;
+    }
+
+
+    score5 =
+        Math.max(
+            0,
+            score5
+        );
+
+
+    /* =====================
+       問6 10点
+       ===================== */
+
+    let c6 =
+        0;
+
+
+    q6.forEach((x, i) => {
+
+        const value =
+            valueOf(
+                `q6r${i}`
+            );
+
+
+        const ok =
+            value !== null &&
+            Number(value) === x.answer;
+
+
+        if (
+            ok
+        ) {
+
+            c6++;
+        }
+
+
+        mark(
+            `q6_${i}`,
+            ok
+                ? "correct"
+                : "incorrect"
+        );
+
+    });
+
+
+    const score6 =
+        c6 /
+        q6.length *
+        10;
+
+
+    /* =====================
+       総合
+       ===================== */
+
+    const total =
+        Math.round(
+            (
+                score1 +
+                score2 +
+                score3 +
+                score4 +
+                score5 +
+                score6
+            )
+            *
+            10
+        )
+        /
+        10;
+
+
+    showResult({
+
+        total,
+
+        score1,
+        score2,
+        score3,
+        score4,
+        score5,
+        score6,
+
+        parseExact,
+
+        first,
+        second,
+
+        unknown4
+
+    });
+
+}
+
+
+/* =========================================================
+   結果
+   ========================================================= */
+
+function showResult(r) {
+
+    document
+        .getElementById(
+            "result"
+        )
+        .classList
+        .add(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "totalScore"
+        )
+        .textContent =
+            r.total;
+
+
+    [
+        r.score1,
+        r.score2,
+        r.score3,
+        r.score4,
+        r.score5,
+        r.score6
+    ]
+    .forEach((x, i) => {
+
+        document
+            .getElementById(
+                `score${i + 1}`
+            )
+            .textContent =
+                Math.round(
+                    x * 10
+                )
+                /
+                10;
+
+    });
+
+
+    const grade =
+        document.getElementById(
+            "grade"
+        );
+
+
+    let text;
+    let cls;
+
+
+    if (
+        r.total >= 90 &&
+        r.parseExact >= 5
+    ) {
+
+        text =
+            "A：非常に適性が高い";
+
+        cls =
+            "good";
+
+    } else if (
+        r.total >= 80
+    ) {
+
+        text =
+            "B：適性あり";
+
+        cls =
+            "good";
+
+    } else if (
+        r.total >= 70
+    ) {
+
+        text =
+            "C：要検討";
+
+        cls =
+            "normal";
+
+    } else {
+
+        text =
+            "D：慎重に判断";
+
+        cls =
+            "bad";
+    }
+
+
+    grade.className =
+        `grade ${cls}`;
+
+    grade.textContent =
+        text;
+
+
+    const reviews =
+        [];
+
+
+    if (
+        r.score3 >= 30
+    ) {
+
+        reviews.push(
+            "住所の構造をかなり正確に理解できています。"
+        );
+
+    } else if (
+        r.score3 < 20
+    ) {
+
+        reviews.push(
+            "住所要素の境界・分類に弱さがあります。"
+        );
+    }
+
+
+    if (
+        r.second <
+        r.first - 1
+    ) {
+
+        reviews.push(
+            "連続作業の後半で精度が低下しています。"
+        );
+    }
+
+
+    if (
+        r.unknown4 > 0
+    ) {
+
+        reviews.push(
+            "分からない地名を「不明」と判断できています。実務上は安全な判断です。"
+        );
+    }
+
+
+    if (
+        r.score2 >= 13
+    ) {
+
+        reviews.push(
+            "細かな文字差を見つける能力は高めです。"
+        );
+    }
+
+
+    document
+        .getElementById(
+            "review"
+        )
+        .innerHTML =
+
+        reviews.length
+
+        ? "<ul>" +
+          reviews
+              .map(
+                  x =>
+                      `<li>${esc(x)}</li>`
+              )
+              .join("")
+          +
+          "</ul>"
+
+        : "大きな問題は見られませんでした。";
+
+
+    document
+        .getElementById(
+            "result"
+        )
+        .scrollIntoView({
+            behavior: "smooth"
+        });
+
+}
+
+
+/* =========================================================
+   進捗
+   ========================================================= */
+
+function countAnswered() {
+
+    let total =
+        0;
+
+    let done =
+        0;
+
+
+    q1.forEach((_, i) => {
+
+        total++;
+
+        if (
+            valueOf(
+                `q1r${i}`
+            )
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    q2.forEach((_, i) => {
+
+        total++;
+
+        const s =
+            diffState[i];
+
+
+        if (
+            s.noDifference ||
+            s.a.size ||
+            s.b.size
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    q3.forEach((_, i) => {
+
+        total++;
+
+        if (
+            parseState[i]
+                .segments
+                .length
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    q4.forEach((_, i) => {
+
+        total++;
+
+        if (
+            document
+                .getElementById(
+                    `q4i${i}`
+                )
+                .value
+                .trim()
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    q5.forEach((_, i) => {
+
+        total++;
+
+        if (
+            valueOf(
+                `q5r${i}`
+            )
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    q6.forEach((_, i) => {
+
+        total++;
+
+        if (
+            valueOf(
+                `q6r${i}`
+            ) !== null
+        ) {
+
+            done++;
+        }
+
+    });
+
+
+    const pct =
+        Math.round(
+            done /
+            total *
+            100
+        );
+
+
+    document
+        .getElementById(
+            "progressBar"
+        )
+        .style
+        .width =
+            pct + "%";
+
+
+    document
+        .getElementById(
+            "progressText"
+        )
+        .textContent =
+            `回答状況：${done}/${total}（${pct}%）`;
+
+}
+
+
+/* =========================================================
+   タイマー
+   ========================================================= */
+
+let elapsed =
+    0;
+
+
+setInterval(
+    () => {
+
+        elapsed++;
+
+
+        const m =
+            Math.floor(
+                elapsed / 60
+            );
+
+
+        const s =
+            elapsed % 60;
+
+
+        document
+            .getElementById(
+                "timer"
+            )
+            .textContent =
+
+            String(m)
+                .padStart(
+                    2,
+                    "0"
+                )
+            +
+            ":"
+            +
+            String(s)
+                .padStart(
+                    2,
+                    "0"
+                );
+
+    },
+    1000
+);
+
+
+/* =========================================================
+   リセット
+   ========================================================= */
+
+function resetTest() {
+
+    if (
+        !confirm(
+            "回答をすべてリセットしますか？"
+        )
+    ) {
+
+        return;
+    }
+
+
+    document
+        .querySelectorAll(
+            'input[type="radio"]'
+        )
+        .forEach(
+            x =>
+                x.checked = false
+        );
+
+
+    document
+        .querySelectorAll(
+            'input[type="text"]'
+        )
+        .forEach(x => {
+
+            if (
+                x.id !==
+                "applicantName"
+            ) {
+
+                x.value =
+                    "";
+            }
+
+        });
+
+
+    diffState
+        .forEach((s, i) => {
+
+            s.a.clear();
+            s.b.clear();
+
+            s.noDifference =
+                false;
+
+            refreshDiff(i);
+
+        });
+
+
+    parseState
+        .forEach((s, i) => {
+
+            s.start =
+                null;
+
+            s.end =
+                null;
+
+            s.segments =
+                [];
+
+            refreshParse(i);
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".question"
+        )
+        .forEach(
+            x =>
+                x.classList.remove(
+                    "correct",
+                    "incorrect",
+                    "warning"
+                )
+        );
+
+
+    document
+        .querySelectorAll(
+            ".small"
+        )
+        .forEach(
+            x => {
+
+                if (
+                    x.id &&
+                    (
+                        x.id.startsWith("q1f") ||
+                        x.id.startsWith("q2f") ||
+                        x.id.startsWith("q3f") ||
+                        x.id.startsWith("q4f")
+                    )
+                ) {
+
+                    x.textContent =
+                        "";
+                }
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "result"
+        )
+        .classList
+        .remove(
+            "show"
+        );
+
+
+    elapsed =
+        0;
+
+
+    countAnswered();
+
+}
+
+
+/* =========================================================
+   初期化
+   ========================================================= */
+
+function init() {
+
+    renderQ1();
+    renderQ2();
+    renderQ3();
+    renderQ4();
+    renderQ5();
+    renderQ6();
+
+
+    document
+        .addEventListener(
+            "change",
+            countAnswered
+        );
+
+
+    document
+        .addEventListener(
+            "input",
+            countAnswered
+        );
+
+
+    countAnswered();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
