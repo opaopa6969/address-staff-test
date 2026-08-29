@@ -1686,6 +1686,26 @@ function assignParse(
             .join("");
 
 
+    if (
+        s.segments.some(
+            seg =>
+                seg.text === text &&
+                seg.type === type
+        )
+    ) {
+
+        s.start =
+            null;
+
+        s.end =
+            null;
+
+        refreshParse(qi);
+
+        return;
+    }
+
+
     s.segments.push({
 
         start:
